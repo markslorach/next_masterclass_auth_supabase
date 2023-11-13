@@ -1,59 +1,40 @@
-// Importing the notFound function from next/navigation
-import { notFound } from "next/navigation"
+import { notFound } from 'next/navigation'
+import { cookies } from 'next/headers'
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 
-// Setting the dynamicParams variable to true
-export const dynamicParams = true // default val = true
+export const dynamicParams = true
 
-// This function generates metadata for a specific ticket based on its id
 export async function generateMetadata({ params }) {
-  const id = params.id
+  const supabase = createServerComponentClient({ cookies })
 
-  // Fetching the ticket data from the server
-  const res = await fetch(`http://localhost:4000/tickets/${id}`)
-  const ticket = await res.json()
+  const { data: ticket } = await supabase.from('tickets')
+    .select()
+    .eq('id', params.id)
+    .single()
  
-  // Returning the title for the metadata
   return {
-    title: `Dojo Helpdesk | ${ticket.title}`
+    title: `Dojo Helpdesk | ${ticket?.title || 'Ticket not Found'}`
   }
 }
 
-// This function generates static parameters for all tickets
-export async function generateStaticParams() {
-  // Fetching all tickets from the server
-  const res = await fetch('http://localhost:4000/tickets')
-
-  const tickets = await res.json()
- 
-  // Mapping over the tickets to return an array of ids
-  return tickets.map((ticket) => ({
-    id: ticket.id
-  }))
-}
-
-// This function fetches a specific ticket based on its id
 async function getTicket(id) {
-  const res = await fetch(`http://localhost:4000/tickets/${id}`, {
-    next: {
-      revalidate: 60
+  const supabase = createServerComponentClient({ cookies })
+
+  const { data } = await supabase.from('tickets')
+    .select()
+    .eq('id', id)
+    .single()
+
+    if (!data) {
+      notFound()
     }
-  })
-
-  // If the response is not ok, it triggers the notFound function
-  if (!res.ok) {
-    notFound()
-  }
-
-  // Returning the ticket data
-  return res.json()
+  
+    return data
 }
 
-// This is the main component that displays the ticket details
 export default async function TicketDetails({ params }) {
-  // Fetching the ticket data
   const ticket = await getTicket(params.id)
 
-  // Returning the JSX for the component
   return (
     <main>
       <nav>
