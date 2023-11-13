@@ -1,17 +1,18 @@
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
-import Link from "next/link"
-import { cookies } from "next/headers"
+import Link from 'next/link'
+import { cookies } from 'next/headers'
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 
 async function getTickets() {
-  const supabase = createServerComponentClient({cookies})
+  const supabase = createServerComponentClient({ cookies })
 
-  const {data, error} = await supabase.from('tickets')
+  const { data, error } = await supabase.from('tickets')
     .select()
 
-    if(error){
-      console.log(error.message)
-    }
-    return data
+  if (error) {
+    console.log(error.message)
+  }
+
+  return data
 }
 
 export default async function TicketList() {
