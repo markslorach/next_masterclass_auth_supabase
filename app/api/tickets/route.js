@@ -10,15 +10,15 @@ export async function POST(request) {
 
   // get current user session
   const { data: { session } } = await supabase.auth.getSession()
-
   // insert the data
   const { data, error } = await supabase.from('tickets')
-    .insert({
-      ...ticket,
-      user_email: session.user.email,
-    })
-    .select()
-    .single()
-
+  .insert({
+    ...ticket,
+    user_email: session.user.email,
+  })
+  .select()
+  .single()
+  
   return NextResponse.json({ data, error })
 }
+

@@ -8,11 +8,11 @@ async function getTickets() {
   const { data, error } = await supabase.from('tickets')
     .select()
 
-  if (error) {
-    console.log(error.message)
-  }
-
-  return data
+    if (error) {
+      console.log(error.message)
+    }
+    
+    return data
 }
 
 export default async function TicketList() {
